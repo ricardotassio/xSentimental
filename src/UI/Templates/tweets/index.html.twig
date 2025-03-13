@@ -33,7 +33,6 @@
     {% else %}
         <p>{{ tweets }}</p>
     {% endif %}
-    
     <script>
         function updateSentiments() {
             fetch('/tweets/sentiments')
