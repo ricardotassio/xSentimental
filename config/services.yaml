@@ -9,7 +9,6 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true  # Automatically registers your services as commands, event subscribers, etc.
         bind:
-            # Este bind padrão injeta o TWITTER_API_KEY para argumentos nomeados $apiKey
             $apiKey: '%env(string:TWITTER_API_KEY)%'
             $openAiApiKey: '%env(string:OPENAI_API_KEY)%'
             $endpoint: '%env(string:OPENAI_ENDPOINT)%'
@@ -26,12 +25,9 @@ services:
     App\UI\Console\Command\TestSentimentCommand:
         tags: ['console.command']
 
-    # Makes classes in src/ available to be used as services.
     App\:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
-    # Add more service definitions when explicit configuration is needed.

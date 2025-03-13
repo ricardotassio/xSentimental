@@ -38,7 +38,6 @@ class SearchTweetsUseCase
             $this->messageBus->dispatch(new AnalyzeTweetMessage($tweet->getId()->getId()));
             $tweets[] = $tweet;
         }
-
         return $tweets;
     }
 }

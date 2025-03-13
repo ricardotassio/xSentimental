@@ -55,6 +55,7 @@ class TwitterApiClient implements TwitterApiClientInterface
             $tweets[] = [
                 'id'   => $tweetData['id']   ?? '',
                 'text' => $tweetData['text'] ?? '',
+                'created_at' => $tweetData['created_at'] ?? '',
             ];
         }
 

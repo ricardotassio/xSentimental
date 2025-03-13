@@ -14,32 +14,30 @@
     </form>
 
     {% if tweets is iterable %}
-        {% if tweets[0] is defined %}
+        {% if tweets.message is defined %}
+            <p>{{ tweets.message }}</p>
+        {% elseif tweets|length > 0 and tweets[0] is defined %}
             <h2>Resultados:</h2>
             <ul>
                 {% for tweet in tweets %}
                     <li id="tweet-{{ tweet.id }}">
-                        {{ tweet.text }}
+                        {{ tweet.text }} - {{ tweet.created_at }}  
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            {% if tweets.message is defined %}
-                <p>{{ tweets.message }}</p>
-            {% else %}
-                <p>{{ tweets|json_encode }}</p>
-            {% endif %}
+            <p>Nenhum tweet encontrado.</p>
         {% endif %}
     {% else %}
         <p>{{ tweets }}</p>
     {% endif %}
+
     <script>
         function updateSentiments() {
             fetch('/tweets/sentiments')
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(item => {
-                        // 'item.id' deve ser a string ou valor do ID do tweet
                         const el = document.getElementById('tweet-' + item.id);
                         if (el) {
                             el.textContent = item.sentiment;

@@ -26,10 +26,8 @@ class TweetController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $hashtag = $request->request->get('hashtag');
-            // O UseCase pode retornar array de tweets ou string de erro/aviso
             $tweets = $this->searchTweetsUseCase->execute($hashtag);
         }
-
         return $this->render('tweets/index.html.twig', [
             'tweets' => $tweets,
         ]);
