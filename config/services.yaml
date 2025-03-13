@@ -11,8 +11,8 @@ services:
         bind:
             # Este bind padrão injeta o TWITTER_API_KEY para argumentos nomeados $apiKey
             $apiKey: '%env(string:TWITTER_API_KEY)%'
-            $akashApiKey: '%env(string:AKASH_API_KEY)%'
-            $endpoint: '%env(string:AKASH_ENDPOINT)%'
+            $openAiApiKey: '%env(string:OPENAI_API_KEY)%'
+            $endpoint: '%env(string:OPENAI_ENDPOINT)%'
   
     App\Infrastructure\Twitter\TwitterApiClient:
         arguments:
@@ -21,8 +21,10 @@ services:
     App\Infrastructure\LLM\SentimentAnalysisClient:
         arguments:
             $httpClient: '@http_client'
-            $akashApiKey: '%env(string:AKASH_API_KEY)%'
-            $endpoint: '%env(string:AKASH_ENDPOINT)%'
+            $openAiApiKey: '%env(string:OPENAI_API_KEY)%'
+            $endpoint: '%env(string:OPENAI_ENDPOINT)%'
+    App\UI\Console\Command\TestSentimentCommand:
+        tags: ['console.command']
 
     # Makes classes in src/ available to be used as services.
     App\:

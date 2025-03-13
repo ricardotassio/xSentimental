@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Command;
+namespace App\UI\Console\Command;
 
 use App\Infrastructure\LLM\SentimentAnalysisClientInterface;
 use Symfony\Component\Console\Command\Command;
@@ -21,6 +21,7 @@ class TestSentimentCommand extends Command
 
     protected function configure()
     {
+        $this->setName('app:test-sentiment');
         $this
             ->setDescription('Testa a análise de sentimento via API do Akash.')
             ->addArgument('text', InputArgument::REQUIRED, 'Texto para análise');

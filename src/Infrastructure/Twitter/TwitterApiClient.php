@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Twitter;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
 class TwitterApiClient implements TwitterApiClientInterface
 {
@@ -24,19 +25,28 @@ class TwitterApiClient implements TwitterApiClientInterface
             return [];
         }
 
-        $response = $this->httpClient->request('GET', $this->endpoint, [
-            'query' => [
-                'query'        => $searchQuery,
-                'max_results'  => 10,
-                'tweet.fields' => 'id,text,created_at',
-            ],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->apiKey,
-            ],
-        ]);
+        try {
+            $response = $this->httpClient->request('GET', $this->endpoint, [
+                'query' => [
+                    'query'        => $searchQuery,
+                    'max_results'  => 10,
+                    'tweet.fields' => 'id,text,created_at',
+                ],
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                ],
+            ]);
 
-        $data = $response->toArray();
-        if (!isset($data['data']) || !is_array($data['data'])) {
+            $data = $response->toArray();
+        } catch (ClientExceptionInterface $e) {
+            if ($e->getCode() === 429) {
+                return [
+                    'message' => 'Limite de requisições atingido. Tente novamente em 15 minutos.',
+                ];
+            }
+            throw $e;
+        }
+        if (empty($data['data']) || !is_array($data['data'])) {
             return [];
         }
 

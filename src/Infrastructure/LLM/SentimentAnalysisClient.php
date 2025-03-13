@@ -9,15 +9,17 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 
 class SentimentAnalysisClient implements SentimentAnalysisClientInterface
 {
+    private const SENTIMENT_NEUTRAL = 'neutro';
+
     private HttpClientInterface $httpClient;
-    private string $akashApiKey;
+    private string $openAiApiKey;
     private string $endpoint;
 
-    public function __construct(HttpClientInterface $httpClient, string $akashApiKey, string $endpoint)
+    public function __construct(HttpClientInterface $httpClient, string $openAiApiKey, string $endpoint)
     {
-        $this->httpClient = $httpClient;
-        $this->akashApiKey = $akashApiKey;
-        $this->endpoint = $endpoint;
+        $this->httpClient   = $httpClient;
+        $this->openAiApiKey = $openAiApiKey;
+        $this->endpoint     = $endpoint;
     }
 
     public function analyzeSentiment(string $text): string
@@ -30,30 +32,31 @@ class SentimentAnalysisClient implements SentimentAnalysisClientInterface
         try {
             $response = $this->httpClient->request('POST', $this->endpoint, [
                 'json' => [
-                    'messages' => [
+                    'model'       => 'gpt-3.5-turbo',
+                    'messages'    => [
                         [
                             'role'    => 'user',
                             'content' => $prompt,
                         ],
                     ],
-                    'model'      => 'gpt-3.5-turbo',
-                    'max_tokens' => 10,
+                    'max_tokens'  => 10,
+                    'temperature' => 0.0,
                 ],
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->akashApiKey,
+                    'Authorization' => 'Bearer ' . $this->openAiApiKey,
                     'Content-Type'  => 'application/json',
                 ],
             ]);
 
             $data = $response->toArray();
         } catch (TransportExceptionInterface | ClientExceptionInterface | ServerExceptionInterface $e) {
-            return 'neutro';
-        }
-        if (isset($data['choices']) && is_array($data['choices']) && count($data['choices']) > 0) {
-            $message = $data['choices'][0]['message']['content'] ?? '';
-            return strtolower(trim($message));
+            return self::SENTIMENT_NEUTRAL;
         }
 
-        return 'neutro';
+        if (!empty($data['choices'][0]['message']['content'])) {
+            return strtolower(trim($data['choices'][0]['message']['content']));
+        }
+
+        return self::SENTIMENT_NEUTRAL;
     }
 }
