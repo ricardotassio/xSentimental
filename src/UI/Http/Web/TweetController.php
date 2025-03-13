@@ -23,24 +23,31 @@ class TweetController extends AbstractController
     public function index(Request $request): Response 
     {
         $tweets = [];
+
         if ($request->isMethod('POST')) {
             $hashtag = $request->request->get('hashtag');
+            // O UseCase pode retornar array de tweets ou string de erro/aviso
             $tweets = $this->searchTweetsUseCase->execute($hashtag);
         }
+
         return $this->render('tweets/index.html.twig', [
             'tweets' => $tweets,
         ]);
     }
+
     #[Route('/tweets/sentiments', name: 'tweets_sentiments', methods: ['GET'])]
     public function sentiments(TweetRepositoryInterface $tweetRepository): JsonResponse
     {
-
+        // Exemplo: se você tiver tweets salvos no banco, busque aqui
         $tweets = $tweetRepository->findAll(); // ou findByHashtag(...)
+        
         $data = [];
         foreach ($tweets as $tweet) {
             $data[] = [
-                'id' => $tweet->getId()->getId(),
-                'sentiment' => $tweet->getSentiment() ? $tweet->getSentiment()->value : 'Aguardando análise...'
+                'id'        => $tweet->getId()->getId(),
+                'sentiment' => $tweet->getSentiment()
+                    ? $tweet->getSentiment()->value
+                    : 'Aguardando análise...',
             ];
         }
 

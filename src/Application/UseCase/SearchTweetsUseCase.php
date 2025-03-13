@@ -8,7 +8,8 @@ use App\Infrastructure\Twitter\TwitterApiClientInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use App\Application\Message\AnalyzeTweetMessage;
 
-class SearchTweetsUseCase {
+class SearchTweetsUseCase 
+{
     private TwitterApiClientInterface $twitterClient;
     private TweetRepositoryInterface $tweetRepository;
     private MessageBusInterface $messageBus;
@@ -23,14 +24,17 @@ class SearchTweetsUseCase {
         $this->messageBus = $messageBus;
     }
 
-    public function execute(string $hashtag): array {
+    public function execute(string $hashtag): array 
+    {
         $tweetsData = $this->twitterClient->searchTweetsByHashtag($hashtag);
+        if (isset($tweetsData['message'])) {
+            return $tweetsData;
+        }
 
         $tweets = [];
         foreach ($tweetsData as $data) {
             $tweet = new Tweet(new TweetId($data['id']), $data['text']);
             $this->tweetRepository->save($tweet);
-            // Dispara mensagem para análise via RabbitMQ
             $this->messageBus->dispatch(new AnalyzeTweetMessage($tweet->getId()->getId()));
             $tweets[] = $tweet;
         }

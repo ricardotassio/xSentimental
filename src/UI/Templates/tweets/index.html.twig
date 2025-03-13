@@ -6,36 +6,41 @@
 </head>
 <body>
     <h1>Busca de Tweets</h1>
+
     <form method="post">
         <label for="hashtag">Hashtag:</label>
         <input type="text" name="hashtag" id="hashtag" placeholder="#Trump">
         <button type="submit">Buscar</button>
     </form>
 
-    {% if tweets is not empty %}
-        <h2>Resultados:</h2>
-        <ul>
-            {% for tweet in tweets %}
-                <li>
-                    <strong>{{ tweet.getContent() }}</strong> - Sentimento:
-                    <span id="tweet-{{ tweet.getId().getId() }}">
-                        {{ tweet.getSentiment() ? tweet.getSentiment().value : 'Aguardando análise...' }}
-                    </span>
-                </li>
-            {% endfor %}
-        </ul>
+    {% if tweets is iterable %}
+        {% if tweets[0] is defined %}
+            <h2>Resultados:</h2>
+            <ul>
+                {% for tweet in tweets %}
+                    <li id="tweet-{{ tweet.id }}">
+                        {{ tweet.text }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {% if tweets.message is defined %}
+                <p>{{ tweets.message }}</p>
+            {% else %}
+                <p>{{ tweets|json_encode }}</p>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <p>{{ tweets }}</p>
     {% endif %}
-
+    
     <script>
-        // Função que busca as atualizações de sentimento via AJAX
         function updateSentiments() {
-            // Substitua /tweets/sentiments pela rota real que retornará o JSON
             fetch('/tweets/sentiments')
                 .then(response => response.json())
                 .then(data => {
-                    // data deve ser um array de objetos: [{id: "abc123", sentiment: "positivo"}, ...]
                     data.forEach(item => {
-                        // Montamos o ID exato que definimos no <span id="tweet-...">
+                        // 'item.id' deve ser a string ou valor do ID do tweet
                         const el = document.getElementById('tweet-' + item.id);
                         if (el) {
                             el.textContent = item.sentiment;
@@ -44,8 +49,6 @@
                 })
                 .catch(error => console.error('Erro ao atualizar sentimentos:', error));
         }
-
-        // Atualiza a cada 5 segundos (5000 ms). Ajuste conforme necessário.
         setInterval(updateSentiments, 5000);
     </script>
 </body>
