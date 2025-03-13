@@ -25,6 +25,16 @@ services:
       - ./:/app
       - ./xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+  worker:
+    build: ./
+    depends_on:
+      - rabbitmq3
+      - db
+    volumes:
+      - ./:/app
+    command: php bin/console messenger:consume async --time-limit=3600 --memory-limit=128M
+    # Ajuste time-limit e memory-limit conforme necessário
+
   db:
     image: postgres:13.3
     environment:
@@ -42,3 +52,32 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
+  ###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-d",
+          "${POSTGRES_DB:-app}",
+          "-U",
+          "${POSTGRES_USER:-app}",
+        ]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+volumes:
+  ###> doctrine/doctrine-bundle ###
+  database_data:
+###< doctrine/doctrine-bundle ###

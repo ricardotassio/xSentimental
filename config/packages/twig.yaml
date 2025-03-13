@@ -1,0 +1,6 @@
+twig:
+    file_name_pattern: '*.twig'
+    default_path: '%kernel.project_dir%/src/UI/Templates'
+when@test:
+    twig:
+        strict_variables: true
