@@ -4,17 +4,19 @@ namespace App\Infrastructure\Twitter;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 class TwitterApiClient implements TwitterApiClientInterface
 {
     private HttpClientInterface $httpClient;
     private string $apiKey;
     private string $endpoint = 'https://api.twitter.com/2/tweets/search/recent';
-
-    public function __construct(HttpClientInterface $httpClient, string $apiKey)
+    private LoggerInterface $logger;
+    public function __construct(HttpClientInterface $httpClient, string $apiKey, LoggerInterface $logger)
     {
         $this->httpClient = $httpClient;
         $this->apiKey = $apiKey;
+        $this->logger = $logger;
     }
 
     public function searchTweetsByHashtag(string $hashtag): array
@@ -55,9 +57,9 @@ class TwitterApiClient implements TwitterApiClientInterface
             $tweets[] = [
                 'id'   => $tweetData['id']   ?? '',
                 'text' => $tweetData['text'] ?? '',
-                'created_at' => $tweetData['created_at'] ?? '',
             ];
         }
+        $this->logger->debug('Tweets data: ' . print_r($tweets, true));
 
         return $tweets;
     }

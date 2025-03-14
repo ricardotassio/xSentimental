@@ -21,7 +21,7 @@
             <ul>
                 {% for tweet in tweets %}
                     <li id="tweet-{{ tweet.id }}">
-                        {{ tweet.text }} - {{ tweet.created_at }}  
+                        {{ tweet.content }}
                     </li>
                 {% endfor %}
             </ul>
@@ -46,7 +46,7 @@
                 })
                 .catch(error => console.error('Erro ao atualizar sentimentos:', error));
         }
-        setInterval(updateSentiments, 5000);
+        //setInterval(updateSentiments, 5000);
     </script>
 </body>
 </html>
