@@ -36,8 +36,7 @@ class TweetController extends AbstractController
     #[Route('/tweets/sentiments', name: 'tweets_sentiments', methods: ['GET'])]
     public function sentiments(TweetRepositoryInterface $tweetRepository): JsonResponse
     {
-        // Exemplo: se você tiver tweets salvos no banco, busque aqui
-        $tweets = $tweetRepository->findAll(); // ou findByHashtag(...)
+        $tweets = $tweetRepository->findAll();
         
         $data = [];
         foreach ($tweets as $tweet) {
