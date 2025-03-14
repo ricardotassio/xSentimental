@@ -12,6 +12,7 @@ class TwitterApiClient implements TwitterApiClientInterface
     private string $apiKey;
     private string $endpoint = 'https://api.twitter.com/2/tweets/search/recent';
     private LoggerInterface $logger;
+    
     public function __construct(HttpClientInterface $httpClient, string $apiKey, LoggerInterface $logger)
     {
         $this->httpClient = $httpClient;

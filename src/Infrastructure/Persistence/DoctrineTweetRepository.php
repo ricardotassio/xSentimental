@@ -15,9 +15,16 @@ class DoctrineTweetRepository implements TweetRepositoryInterface {
         $this->repository = $em->getRepository(Tweet::class);
     }
 
-    public function save(Tweet $tweet): void {
-        $this->em->persist($tweet);
-        $this->em->flush();
+    public function save(Tweet $tweet): void 
+    {
+        $existingTweet = $this->em
+            ->getRepository(Tweet::class)
+            ->find($tweet->getId());
+
+        if (!$existingTweet) {
+          $this->em->persist($tweet);
+          $this->em->flush();
+        }
     }
 
     public function findById(string $id): ?Tweet {

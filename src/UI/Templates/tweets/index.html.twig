@@ -21,7 +21,8 @@
             <ul>
                 {% for tweet in tweets %}
                     <li id="tweet-{{ tweet.id }}">
-                        {{ tweet.content }}
+                        {{ tweet.content }} 
+                        <span id="sentiment-{{ tweet.id }}">Aguardando análise...</span>
                     </li>
                 {% endfor %}
             </ul>
@@ -38,9 +39,10 @@
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(item => {
-                        const el = document.getElementById('tweet-' + item.id);
-                        if (el) {
-                            el.textContent = item.sentiment;
+                        // Localiza o <span id="sentiment-{id}">
+                        const sentimentEl = document.getElementById('sentiment-' + item.id);
+                        if (sentimentEl) {
+                            sentimentEl.textContent = item.sentiment;
                         }
                     });
                 })
